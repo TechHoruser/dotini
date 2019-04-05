@@ -15,11 +15,10 @@ class DotIniConfig
     private $dotIniParams;
 
     /**
-     * D3Connection Constructor
-     * Crea una nueva conexi�n
-     *
-     * @param $iniPath
-     * @param $iniFilename
+     * DotIniConfig constructor.
+     * @param string $iniPath
+     * @param string $iniFilename
+     * @throws ConfigExeption
      */
     public function __construct($iniPath, $iniFilename)
     {
@@ -47,12 +46,12 @@ class DotIniConfig
      */
     public function getIniFullName()
     {
-        return $this->iniPath.'/'.$this->iniFilename.'.ini';
+        return $this->iniPath . '/' . $this->iniFilename . '.ini';
     }
 
     /**
-     * @param $iniPath
-     * @param $iniFilename
+     * @param string $iniPath
+     * @param string $iniFilename
      * @return $this
      * @throws ConfigExeption
      */
@@ -61,10 +60,14 @@ class DotIniConfig
         $this->iniPath = $iniPath;
         $this->iniFilename = $iniFilename;
 
-        $this->dotIniParams = parse_ini_file($iniPath.'/'.$iniFilename.'.ini', true);
+        try {
+            $this->dotIniParams = parse_ini_file($iniPath . '/' . $iniFilename . '.ini', true);
+        } catch (\Exception $exception) {
+            throw new ConfigExeption('No se ha podido cargar el fichero "' . $iniPath . '/' . $iniFilename . '"');
+        }
 
-        if ($this->dotIniParams === false) {
-            throw new ConfigExeption('No se ha podido cargar el fichero "'.$iniPath.'/'.$iniFilename.'"');
+        if (empty($this->dotIniParams) && (($file = file_get_contents($this->getIniFullName())) !== '' || $file === false)) {
+            throw new ConfigExeption('El fichero "' . $iniPath . '/' . $iniFilename . '" está mal formado.');
         }
 
         return $this;
@@ -77,24 +80,36 @@ class DotIniConfig
      */
     public function getStrictParam($param)
     {
-        if(!isset($this->dotIniParams[$param])){
-            throw new ConfigExeption('Sin declarar parámetro necesario "'.$param.'"');
+        $array = preg_split("/(?<!\\\)\\//", $param);
+        $conf = $this->dotIniParams;
+        foreach ($array as $section) {
+            $section = preg_replace("/\\\/", "", $section);
+            if (!isset($conf[$section])) {
+                throw new ConfigExeption('Sin declarar parámetro necesario "' . $param . '"');
+            }
+            $conf = $conf[$section];
         }
 
-        return $this->dotIniParams[$param];
+        return $conf;
     }
 
     /**
      * @param string $param
-     * @param mixed|null $defaultValue
+     * @param null $defaultValue
      * @return mixed|null
      */
     public function getOptionalParam($param, $defaultValue = null)
     {
-        if(!isset($this->dotIniParams[$param])){
-            return $defaultValue;
+        $array = preg_split("/(?<!\\\)\\//", $param);
+        $conf = $this->dotIniParams;
+        foreach ($array as $section) {
+            $section = preg_replace("/\\\/", "", $section);
+            if (!isset($conf[$section])) {
+                return $defaultValue;
+            }
+            $conf = $conf[$section];
         }
 
-        return $this->dotIniParams[$param];
+        return $conf;
     }
 }

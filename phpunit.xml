@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- http://www.phpunit.de/manual/current/en/appendixes.configuration.html -->
+<phpunit
+        backupGlobals = "false"
+        backupStaticAttributes = "false"
+        colors = "true"
+        convertErrorsToExceptions = "true"
+        convertNoticesToExceptions = "true"
+        convertWarningsToExceptions = "true"
+        processIsolation = "false"
+        stopOnFailure = "true"
+        syntaxCheck = "false"
+        bootstrap = "vendor/autoload.php" >
+
+    <testsuites>
+        <testsuite name="Test Suite">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <logging>
+        <log type="junit" target="build/test/coverage.xml"/>
+        <log type="testdox-text" target="build/test/testdox.txt" />
+        <log type="testdox-html" target="build/test/testdox.html" />
+        <log type="coverage-text" target="php://stdout" showUncoveredFiles="true" />
+        <log type="coverage-html" target="build/test/coverage" lowUpperBound="50" highLowerBound="90" />
+        <log type="coverage-clover" target="build/test/clover.xml" />
+    </logging>
+
+</phpunit>
