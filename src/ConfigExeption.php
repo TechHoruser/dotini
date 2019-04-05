@@ -4,7 +4,7 @@ namespace mortalswat\dotini;
 
 /**
  * Class ConfigExeption
- * @package Domain\Config
+ * @package mortalswat\dotini
  */
 class ConfigExeption extends \Exception
 {
