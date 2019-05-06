@@ -1,6 +1,6 @@
 # Composer Library
-https://packagist.org/packages/mortalswat/json-http-connector
+https://packagist.org/packages/mortalswat/dotini
 
 ```
-composer require mortalswat/json-http-connector
+composer require mortalswat/dotini
 ```
